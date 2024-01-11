@@ -1,0 +1,200 @@
+:root {
+  --card-background: hsl(212, 30%, 96%);
+}
+
+[data-theme="dark"] {
+  --card-background: hsl(230deg 14% 23%);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="dark-system"],
+  [data-theme="dark-system"] {
+    --card-background: hsl(230deg 14% 23%);
+  }
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  height: 80%;
+}
+.Resizer {
+  background: #000;
+  opacity: 0.2;
+  z-index: 1;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding;
+  background-clip: padding-box;
+  &:hover {
+    -webkit-transition: all 2s ease;
+    transition: all 2s ease;
+  }
+}
+.Resizer.horizontal {
+  height: 11px;
+  margin: -5px 0;
+  border-top: 5px solid rgba(255, 255, 255, 0);
+  border-bottom: 5px solid rgba(255, 255, 255, 0);
+  cursor: row-resize;
+  width: 100%;
+  &:hover {
+    border-top: 5px solid rgba(0, 0, 0, 0.5);
+    border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+  }
+}
+.Resizer.vertical {
+  width: 11px;
+  margin: 0 0 -5px 4px;
+  border-left: 5px solid rgba(255, 255, 255, 0);
+  border-right: 5px solid rgba(255, 255, 255, 0);
+  cursor: col-resize;
+  &:hover {
+    border-left: 5px solid rgba(0, 0, 0, 0.5);
+    border-right: 5px solid rgba(0, 0, 0, 0.5);
+  }
+}
+.Resizer.disabled {
+  cursor: not-allowed;
+  &:hover {
+    border-color: transparent;
+  }
+}
+.SplitPane {
+  position: relative;
+}
+
+.console-output {
+  text-align: left;
+  padding-left: 16px;
+}
+
+.console-output p {
+  margin: 0;
+}
+
+.console-pane pre {
+  padding-left: 16px;
+}
+
+.ansi-fg-0 {
+  color: var(--black, #333);
+}
+
+.ansi-fg-1 {
+  color: var(--danger, #cc0003);
+}
+
+.ansi-fg-2 {
+  color: var(--success, #138347);
+}
+
+.ansi-fg-3 {
+  color: var(--warning, #ea6b19);
+}
+
+.ansi-fg-4 {
+  color: var(--primary, #0b6aa2);
+}
+
+.ansi-fg-5 {
+  color: var(--unknown-color, #bd0fe1);
+}
+
+.ansi-fg-6 {
+  color: var(--paused-color, #24b0d5);
+}
+
+.ansi-fg-7 {
+  color: var(--white, #fff);
+}
+
+// Standard background colors
+.ansi-bg-0 {
+  background: var(--black, #333);
+}
+
+.ansi-bg-1 {
+  background: var(--danger, #cc0003);
+}
+
+.ansi-bg-2 {
+  background: var(--success, #138347);
+}
+
+.ansi-bg-3 {
+  background: var(--warning, #ea6b19);
+}
+
+.ansi-bg-4 {
+  background: var(--primary, #0b6aa2);
+}
+
+.ansi-bg-5 {
+  background: var(--unknown-color, #bd0fe1);
+}
+
+.ansi-bg-6 {
+  background: var(--paused-color, #24b0d5);
+}
+
+.ansi-bg-7 {
+  background: var(--white, #fff);
+}
+
+.MuiTreeItem-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 15px;
+  margin: 0 0 5px 0 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  background: var(--card-background);
+  box-shadow: 0 0 1px rgb(0 0 0 / 6%);
+}
+
+.MuiTreeItem-label.pgv-graph-node--synthetic {
+  font-style: italic;
+}
+
+#main-panel {
+  padding-left: 0;
+}
+
+.jenkins-button svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: currentColor !important;
+}
+
+a.console-line-number {
+  text-align: right;
+  min-width: 40px;
+  max-width: 40px;
+  margin-left: -15px;
+  margin-right: 27px;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+  display: inline-block;
+}
+
+div.console-output-line-anchor {
+  position: relative;
+  // This is the width of the '.jenkins-breadcrumbs' div + a little extra.
+  top: -50px;
+  visibility: hidden;
+}
+
+.console-pane {
+  margin-left: 5px;
+}
+
+pre.console-pane {
+  background-color: var(--card-background);
+}
+
+div.console-output-line {
+  display: flex;
+}
