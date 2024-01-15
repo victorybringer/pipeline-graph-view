@@ -59,4 +59,11 @@ module.exports = [
       filename: 'multi-pipeline-graph-view-bundle.js',
     }
   }),
+  wrapWithDefaultModule({
+    entry: './src/main/frontend/pipeline-agent-view',
+    output: {
+      path: path.resolve(__dirname, 'src/main/webapp/js/bundles'),
+      filename: 'pipeline-agent-view-bundle.js',
+    }
+  }),
 ];
