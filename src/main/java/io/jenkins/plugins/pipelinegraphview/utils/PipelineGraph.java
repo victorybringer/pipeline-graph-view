@@ -4,6 +4,7 @@ import java.util.List;
 
 public class PipelineGraph {
 
+
   private List<PipelineStage> stages;
   private boolean complete = false;
 

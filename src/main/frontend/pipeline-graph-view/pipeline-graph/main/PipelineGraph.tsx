@@ -9,16 +9,21 @@ import {
   NodeColumn,
   NodeInfo,
   StageInfo,
+  StageType,
 } from "./PipelineGraphModel";
 import { layoutGraph } from "./PipelineGraphLayout";
 
 import { Node, SelectionHighlight } from "./support/nodes";
+import SimpleSelect from "./support/select";
 import {
   BigLabel,
   SmallLabel,
   SequentialContainerLabel,
 } from "./support/labels";
 import { GraphConnections } from "./support/connections";
+import { cursorTo } from "readline";
+import { resolveAny } from "dns";
+import { ContactsOutlined } from "@material-ui/icons";
 
 interface Props {
   stages: Array<StageInfo>;
@@ -28,9 +33,11 @@ interface Props {
   selectedStage?: StageInfo;
   path?: string;
   collapsed?: boolean;
+  
 }
 
 interface State {
+  stages : Array<StageInfo>;
   nodeColumns: Array<NodeColumn>;
   connections: Array<CompositeConnection>;
   bigLabels: Array<NodeLabelInfo>;
@@ -40,6 +47,8 @@ interface State {
   measuredHeight: number;
   layout: LayoutInfo;
   selectedStage?: StageInfo;
+  agentNodes : Array<StageInfo>;
+  agentfilter : string
 }
 
 export class PipelineGraph extends React.Component {
@@ -49,6 +58,7 @@ export class PipelineGraph extends React.Component {
   constructor(props: Props) {
     super(props);
     this.state = {
+      stages : [],
       nodeColumns: [],
       connections: [],
       bigLabels: [],
@@ -58,26 +68,98 @@ export class PipelineGraph extends React.Component {
       measuredHeight: 0,
       layout: { ...defaultLayout, ...props.layout },
       selectedStage: props.selectedStage,
+      agentNodes:[],
+      agentfilter : ""
     };
   }
 
-  componentDidMount() {
-    const onPipelineDataReceived = (data: { stages: Array<StageInfo> }) => {
-      const { stages } = data;
-      this.setState({ stages });
-      this.stagesUpdated(stages);
+  recursivesearchNode(stage: StageInfo)  {
+
+    if (stage.children.length == 0) {
+      return [stage]
+    }
+    else {
+      
+     var res: Array<StageInfo> = []
+
+   
+
+     for (var i = 0;i < stage.children.length;++i){
+       
+      
+       res = res.concat(this.recursivesearchNode(stage.children[i]))
+
+     }
+
+     return res 
+
+    }
+    
+
+
+  }
+ 
+  
+  onPipelineDataReceived = (data: { stages: Array<StageInfo> }) => {
+      
+      var { stages } = data;
+     
+     
+      var allstages:Array<StageInfo> =  stages.map((stage) => this.recursivesearchNode(stage)).reduce((pre,cur) => pre.concat(cur) ,[])
+      
+      this.setState({ agentNodes: allstages.filter((stage) => stage.type == "AGENT" as StageType)})
+      this.stagesUpdated(stages)
+     
     };
-    const onPollingError = (err: Error) => {
+
+  onPipelineDataReceived2 = (data: { stages: Array<StageInfo> }) => {
+      
+      var { stages } = data;
+     
+     
+      var allstages:Array<StageInfo> =  stages.map((stage) => this.recursivesearchNode(stage)).reduce((pre,cur) => pre.concat(cur) ,[])
+      
+      this.setState({ agentNodes: allstages.filter((stage) => stage.type == "AGENT" as StageType)})
+      const stages2 = stages.map((stage) => {
+      
+        if (stage.children.length > 0 && stage.children[0].type == "PARALLEL"  as StageType) {
+          
+          stage.children = stage.children.filter((child) => child.children[0].title ==this.state.agentfilter || this.state.agentfilter == "All")
+          return stage
+        }
+  
+        else{
+          return stage
+  
+        }
+        
+        });
+      this.stagesUpdated(stages2)
+        
+     
+    };  
+    
+   
+      
+    
+    
+  onPollingError = (err: Error) => {
       console.log("There was an error when polling the pipeline status", err);
     };
-    const onPipelineComplete = () => undefined;
+  onPipelineComplete = () => undefined;
 
+  componentDidMount() {
+    
+    
     startPollingPipelineStatus(
-      onPipelineDataReceived,
-      onPollingError,
-      onPipelineComplete,
+      this.onPipelineDataReceived,
+      this.onPollingError,
+      this.onPipelineComplete,
       this.props.path ?? "tree"
     );
+      
+    
+    
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -148,6 +230,22 @@ export class PipelineGraph extends React.Component {
       this.setState({ selectedStage: stage });
     }
   };
+  handleSelect = (agent:string) => {
+
+    this.setState({agentfilter:agent},()=> {      
+      
+      startPollingPipelineStatus(
+
+        this.onPipelineDataReceived2,
+        this.onPollingError,
+        this.onPipelineComplete,
+        this.props.path ?? "tree"
+      )
+    
+    });
+     
+
+  }
 
   render() {
     const {
@@ -157,7 +255,8 @@ export class PipelineGraph extends React.Component {
       smallLabels,
       branchLabels,
       measuredWidth,
-      measuredHeight,
+      measuredHeight
+     
     } = this.state;
 
     // Without these we get fire, so they're hardcoded
@@ -177,13 +276,15 @@ export class PipelineGraph extends React.Component {
 
     return (
       <div className="PWGx-PipelineGraph-container">
+
+       <SimpleSelect node_name_list= {this.state.agentNodes.map((node) => node.name).reduce( (pre:string[],cur) =>pre.includes(cur) ? pre : pre.concat([cur]),[])}  onClick={this.handleSelect}/>
         <div style={outerDivStyle as any} className="PWGx-PipelineGraph">
           <svg width={measuredWidth} height={measuredHeight}>
             <GraphConnections
               connections={connections}
               layout={this.state.layout}
             />
-
+          
             {nodes.map((node) => (
               <Node
                 key={node.id}

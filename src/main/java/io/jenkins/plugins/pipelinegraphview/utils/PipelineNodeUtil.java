@@ -211,17 +211,26 @@ public class PipelineNodeUtil {
 
     return false;
   }
+  
+  public static String getAgentName(@NonNull FlowNode node){
+        if(node.getAction(WorkspaceAction.class) != null){
 
-  public static String getAgentName(@Nullable FlowNode node){
-
-        return node.getAction(WorkspaceAction.class).getNode();
+          String res = node.getAction(WorkspaceAction.class).getNode() == null ? "undefiend" : node.getAction(WorkspaceAction.class).getNode();
+return res;
+        }
+        return "";
+      
+  }
+   
+   public static FilePath getAgentWorkSpace(@NonNull  FlowNode node){
+      if(node.getAction(WorkspaceAction.class) != null){
+        FilePath res = node.getAction(WorkspaceAction.class).getNode() == null ? new FilePath(null) : node.getAction(WorkspaceAction.class).getWorkspace();
+        return res;
+      }
+       
+      return new FilePath(null);
 
 
   }
-   public static FilePath getAgentWorkSpace(@Nullable FlowNode node){
 
-        return node.getAction(WorkspaceAction.class).getWorkspace();
-
-
-  }
 }

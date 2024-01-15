@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.*;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.jenkins.ui.icon.IconSpec;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -73,6 +75,21 @@ public abstract class AbstractPipelineViewAction implements Action, IconSpec {
     JSONObject graph = createJson(api.createTree());
 
     return HttpResponses.okJSON(graph);
+  }
+  @WebMethod(name = "alljobs")
+  public HttpResponse getAllJobs() throws JsonProcessingException {
+    // TODO: This need to be updated to return a tree representation of the graph, not the graph.
+    // Here is how FlowGraphTree does it:
+    // https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
+    
+    JSONArray graphArray = new JSONArray();
+
+    for (PipelineGraphWithJob g : api.getallJobs()) {
+        JSONObject graph = JSONObject.fromObject(g);
+        graphArray.add(graph);
+    }
+    
+    return HttpResponses.okJSON(graphArray);
   }
 
   @WebMethod(name = "replay")

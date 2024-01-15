@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+    <l:layout title="${%Build log} [${it.buildDisplayName}]" type="one-column">
+        <l:main-panel>
+            <div class="jenkins-app-bar">
+                <div class="jenkins-app-bar__content">
+                    <h1>
+                        <l:icon alt="${it.iconColor.description}" class="${it.buildStatusIconClassName} icon-xlg" tooltip="${it.iconColor.description}"/>
+                        ${it.buildDisplayName}
+                    </h1>
+                </div>
+                
+                <script src="${rootURL}/plugin/pipeline-graph-view/js/build.js"/>
+            </div>
+
+            <div id="root"/>
+            <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/pipeline-agent-view-bundle.js"/>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

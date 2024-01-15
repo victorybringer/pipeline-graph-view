@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import org.apache.commons.lang.StringUtils;
+import io.jenkins.plugins.pipelinegraphview.utils.BlueRun.BlueRunResult;
+import io.jenkins.plugins.pipelinegraphview.utils.BlueRun.BlueRunState;
 import org.jenkinsci.plugins.pipeline.modeldefinition.actions.ExecutionModelAction;
 import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.NotExecutedNodeAction;
@@ -613,7 +615,7 @@ public class PipelineNodeGraphVisitor extends StandardChunkVisitor {
 
     if (atomNode instanceof StepStartNode && PipelineNodeUtil.isAgentStart(atomNode)) {
        
-       nodes.add(new FlowNodeWrapper(atomNode, null, null, run));
+       nodes.add(new FlowNodeWrapper(atomNode, new NodeRunStatus(BlueRunResult.SUCCESS, BlueRunState.FINISHED), new TimingInfo(), run));
     } 
 
     if (atomNode instanceof FlowStartNode) {

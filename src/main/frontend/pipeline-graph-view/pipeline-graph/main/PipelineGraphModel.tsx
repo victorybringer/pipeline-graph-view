@@ -57,6 +57,19 @@ export interface StageInfo {
   synthetic?: boolean;
 }
 
+export interface agentPipelineInfo {
+  name: string;
+  title: string;
+  state: Result;
+  completePercent: number;
+  id: number;
+  type: StageType;
+  children: Array<StageInfo>; // Used by the top-most stages with parallel branches
+  nextSibling?: StageInfo; // Used within a parallel branch to denote sequential stages
+  isSequential?: boolean;
+  synthetic?: boolean;
+}
+
 interface BaseNodeInfo {
   key: string;
   x: number;

@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipelinegraphview;
+package io.jenkins.plugins.pipelinegraphview.agentview;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -9,8 +9,8 @@ import jenkins.model.TransientActionFactory;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 @Extension
-public class PipelineGraphViewActionFactory extends TransientActionFactory<WorkflowRun> {
-  
+public class PipelineAgentViewActionFactory extends TransientActionFactory<WorkflowRun> {
+
   @Override
   public Class<WorkflowRun> type() {
     return WorkflowRun.class;
@@ -19,7 +19,8 @@ public class PipelineGraphViewActionFactory extends TransientActionFactory<Workf
   @NonNull
   @Override
   public Collection<? extends Action> createFor(@NonNull WorkflowRun target) {
-    PipelineGraphViewAction a = new PipelineGraphViewAction(target);
+    
+    PipelineAgentViewAction a = new PipelineAgentViewAction(target);
     return Collections.singleton(a);
   }
 }
