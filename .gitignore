@@ -1,0 +1,27 @@
+node
+node_modules
+target
+
+# mvn hpi:run
+work
+
+# frontend build output
+src/main/webapp/js/bundles
+
+# IntelliJ IDEA project files
+*.iml
+*.iws
+*.ipr
+.idea
+target
+work
+# Eclipse project files
+.settings
+.classpath
+.project
+.factorypath
+
+# VS Code project files
+.vscode
+
+*.dylib
