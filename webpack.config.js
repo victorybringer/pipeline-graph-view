@@ -1,8 +1,12 @@
 const path = require('path');
-
+const webpack = require('webpack');
 const wrapWithDefaultModule = (config) => {
   return {
     devtool: 'source-map',
+    plugins: [
+      new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify('production') }),
+     
+    ],
     module: {
       rules: [
         {
@@ -17,6 +21,12 @@ const wrapWithDefaultModule = (config) => {
           enforce: 'pre',
           loader: 'source-map-loader',
         },
+      
+        {
+          test: /\.css$/,
+          loaders: ['style-loader', 'css-loader']
+        },
+
         {
           test: /\.scss$/i,
           use: ['style-loader', 'css-loader', 'sass-loader'],

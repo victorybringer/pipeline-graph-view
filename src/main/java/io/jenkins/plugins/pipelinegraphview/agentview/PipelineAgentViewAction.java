@@ -1,25 +1,53 @@
 package io.jenkins.plugins.pipelinegraphview.agentview;
 
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.WebMethod;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import hudson.util.HttpResponses;
+import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraph;
+import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraphApi;
+import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraphWithJob;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import hudson.model.*;
+import hudson.Extension;
 
+@Extension
+public class PipelineAgentViewAction implements RootAction {
 
-import io.jenkins.plugins.pipelinegraphview.utils.AbstractPipelineViewAction;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+    protected JSONObject createJson(PipelineGraph pipelineGraph) throws JsonProcessingException {
+    String graph = OBJECT_MAPPER.writeValueAsString(pipelineGraph);
+    return JSONObject.fromObject(graph);
+  }
 
+  @WebMethod(name = "alljobs")
+  public HttpResponse getAllJobs() throws JsonProcessingException {
+    // TODO: This need to be updated to return a tree representation of the graph, not the graph.
+    // Here is how FlowGraphTree does it:
+    // https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
+    
+    JSONArray graphArray = new JSONArray();
 
-public class PipelineAgentViewAction extends AbstractPipelineViewAction {
-  public static final long LOG_THRESHOLD = 150 * 1024; // 150KB
-
-
-  public PipelineAgentViewAction(WorkflowRun target) {
-    super(target);
- 
-   
+    for (PipelineGraphWithJob g : PipelineGraphApi.getallJobs()) {
+        JSONObject graph = JSONObject.fromObject(g);
+        graphArray.add(graph);
+    }
+    
+    return HttpResponses.okJSON(graphArray);
   }
 
   @Override
+  public String getIconFileName() {
+    return "/plugin/pipeline-graph-view-icore2/images/rocket-outline.svg";
+  }
+
+  
+  @Override
   public String getDisplayName() {
-    return "Pipeline Agent";
+    return "Enhanced Build History";
   }
 
   @Override
@@ -27,10 +55,7 @@ public class PipelineAgentViewAction extends AbstractPipelineViewAction {
     return "pipeline-agent-dashboard";
   }
 
-  @Override
-  public String getIconClassName() {
-    return "symbol-rocket-outline plugin-ionicons-api";
-  }
+  
 
  
 }

@@ -6,21 +6,20 @@ import hudson.model.Action;
 import java.util.Collection;
 import java.util.Collections;
 import jenkins.model.TransientActionFactory;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import hudson.model.*;
 
 @Extension
-public class PipelineAgentViewActionFactory extends TransientActionFactory<WorkflowRun> {
-
+public class PipelineAgentViewActionFactory extends TransientActionFactory<Job> {
+  
   @Override
-  public Class<WorkflowRun> type() {
-    return WorkflowRun.class;
+  public Class<Job> type() {
+    return Job.class;
   }
 
   @NonNull
   @Override
-  public Collection<? extends Action> createFor(@NonNull WorkflowRun target) {
-    
-    PipelineAgentViewAction a = new PipelineAgentViewAction(target);
+  public Collection<? extends Action> createFor(@NonNull Job target) {
+    PipelineAgentViewAction a = new PipelineAgentViewAction();
     return Collections.singleton(a);
   }
 }

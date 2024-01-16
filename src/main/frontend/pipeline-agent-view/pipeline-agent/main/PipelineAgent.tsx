@@ -4,10 +4,10 @@ import React from "react";
 import { StageInfo } from "../../../pipeline-graph-view/pipeline-graph/main";
 
 import {Data,createData} from "../../dategrid";
-import EnhancedTable from "../../dategrid";
-import BasicTable  from "../../basictable";
+
+import PaginatedTable from "./elementtable";
 import "./pipeline-agent.scss";
-import { resolveAny } from "dns";
+
 import { StageType } from "../../../pipeline-graph-view/pipeline-graph/main/PipelineGraphModel";
 
 
@@ -38,6 +38,10 @@ export class PipelineAgent extends React.Component<
     this.setAgents();
   }
 
+  handlePaginationChange(e:any){
+     console.log(e)
+  }
+
   extractAgentStages(stages:Array<StageInfo>):Array<StageInfo>{
     let agentStages:Array<StageInfo> = [];
     for (let stage of stages) {
@@ -57,7 +61,7 @@ export class PipelineAgent extends React.Component<
     const res = await fetch("alljobs");
     const result_1 = await res.json();
     console.log(result_1.data)
-    const combine:Array<Data> = []
+    var combine:Array<Data> = []
     for (let jsonres of result_1.data){
 
       for (let ag of this.extractAgentStages(jsonres.stages)){
@@ -65,18 +69,28 @@ export class PipelineAgent extends React.Component<
       }
 
     }
-   
-    this.setState({
-      stages: combine,
-    });
-  }
 
+    
+    combine = combine.reduce((acc:Data[], current) => {
+      const x = acc.find(item => item.jobName === current.jobName && item.buildNumber === current.buildNumber && item.agentname === current.agentname && item.buildtime === current.buildtime);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, []);
+    this.setState({
+      stages: combine.reduce( (pre:Data[],cur) => pre.includes(cur) ? pre : pre.concat([cur]) ,[]) })
+    
+    }
+    
 
   render() {
     return (
       <React.Fragment>
         <div className="App">
-          <EnhancedTable rows={this.state.stages} />
+          <PaginatedTable data={this.state.stages} />
+          
         </div>
       </React.Fragment>
     );

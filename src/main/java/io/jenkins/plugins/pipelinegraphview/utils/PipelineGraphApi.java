@@ -84,7 +84,7 @@ public class PipelineGraphApi {
             })
         .collect(Collectors.toList());
   }
-  private List<PipelineStageInternal> getPipelineNodesWithRun(WorkflowRun run0) {
+  private static List<PipelineStageInternal> getPipelineNodesWithRun(WorkflowRun run0) {
     
     PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run0);
     return builder.getPipelineNodes().stream()
@@ -124,6 +124,21 @@ public class PipelineGraphApi {
         .collect(Collectors.toList());
   }
 
+  
+  public static List <PipelineGraphWithJob> getallJobs(){
+    
+    List <PipelineGraphWithJob> res = new ArrayList<>();
+    
+    Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
+    
+    for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
+     PipelineGraph pg = createTreeWithRun(e.getValue());
+     res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString()));
+    }
+    
+    return res;
+
+ }
   public PipelineGraph createGraph() {
     List<PipelineStageInternal> stages = getPipelineNodes();
 
@@ -202,7 +217,7 @@ public class PipelineGraphApi {
     return new PipelineGraph(stageResults, execution != null && execution.isComplete());
   }
 
-  private Function<String, PipelineStage> mapper(
+  private static Function<String, PipelineStage> mapper(
       Map<String, PipelineStageInternal> stageMap, Map<String, List<String>> stageToChildrenMap) {
 
     return id -> {
@@ -217,21 +232,8 @@ public class PipelineGraphApi {
    * Create a Tree from the GraphVisitor.
    * Original source: https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
    */
-  public List <PipelineGraphWithJob> getallJobs(){
-    
-     List <PipelineGraphWithJob> res = new ArrayList<>();
-     
-     Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
-     
-     for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
-      PipelineGraph pg = createTreeWithRun(e.getValue());
-      res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString()));
-     }
-     
-     return res;
 
-  }
-  public PipelineGraph createTreeWithRun(WorkflowRun run0) {
+  public static PipelineGraph createTreeWithRun(WorkflowRun run0) {
     List<PipelineStageInternal> stages = getPipelineNodesWithRun(run0);
     
     List<String> topLevelStageIds = new ArrayList<>();
@@ -405,7 +407,7 @@ public class PipelineGraphApi {
     return new PipelineGraph(stageResults, execution.isComplete());
   }
 
-  private List<String> getAncestors(
+  private static List<String> getAncestors(
       PipelineStageInternal stage, Map<String, PipelineStageInternal> stageMap) {
     List<String> ancestors = new ArrayList<>();
     if (!stage.getParents().isEmpty()) {
