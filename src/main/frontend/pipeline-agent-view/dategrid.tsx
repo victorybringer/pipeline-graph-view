@@ -23,18 +23,24 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 export interface Data {
   jobName: string;
   buildNumber: string;
+  casename:string;
   agentname: string;
   buildtime: string;
+  nodeid:number
+  
   
 }
 
 export function createData(
     jobName: string,
     buildNumber: string,
+    casename: string,
     agentname: string,
     buildtime: string,
+    nodeid:number
+    
 ): Data {
-  return { jobName,buildNumber,agentname,buildtime };
+  return { jobName,buildNumber,casename,agentname,buildtime,nodeid};
 }
 
 
@@ -345,6 +351,7 @@ export default function EnhancedTable(props:EnhancedTablePropsRows) {
                         {row.agentname}
                       </TableCell>
                       <TableCell align="right">{row.jobName}</TableCell>
+                      <TableCell align="right">{row.casename}</TableCell>
                       <TableCell align="right">{row.buildNumber}</TableCell>
                       <TableCell align="right">{row.buildtime}</TableCell>
                

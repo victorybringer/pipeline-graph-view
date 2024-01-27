@@ -26,12 +26,12 @@
             ${%Configure}
           </a>
         </div>
-        <script src="${rootURL}/plugin/pipeline-graph-view/js/build.js"/>
+        <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/build.js"/>
       </div>
       <div class="pgv-cards">
         <p:card title="${%Pipeline}" type="wide" expandable="true">
           <div id="graph"/>
-          <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/pipeline-graph-view-bundle.js"/>
+          <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/bundles/pipeline-graph-view-bundle.js"/>
         </p:card>
         <p:card title="${it.runDetailsCard.title}">
           <j:forEach var="card" items="${it.runDetailsCard.items}">

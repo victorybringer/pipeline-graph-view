@@ -62,6 +62,7 @@ public class PipelineNodeGraphVisitor extends StandardChunkVisitor {
   private final ArrayDeque<FlowNodeWrapper> parallelBranches = new ArrayDeque<>();
 
   public final ArrayDeque<FlowNodeWrapper> nodes = new ArrayDeque<>();
+  public final ArrayDeque<FlowNodeWrapper> agenthistnodes = new ArrayDeque<>();
 
   private FlowNode firstExecuted = null;
 
@@ -614,8 +615,12 @@ public class PipelineNodeGraphVisitor extends StandardChunkVisitor {
     accumulatePipelineActions(atomNode);
 
     if (atomNode instanceof StepStartNode && PipelineNodeUtil.isAgentStart(atomNode)) {
-       
-       nodes.add(new FlowNodeWrapper(atomNode, new NodeRunStatus(BlueRunResult.SUCCESS, BlueRunState.FINISHED), new TimingInfo(), run));
+       FlowNodeWrapper fn = new FlowNodeWrapper(atomNode, new NodeRunStatus(BlueRunResult.SUCCESS, BlueRunState.FINISHED), new TimingInfo(), run);
+       nodes.add(fn);
+       agenthistnodes.add(fn);
+      
+    
+    
     } 
 
     if (atomNode instanceof FlowStartNode) {
@@ -671,6 +676,10 @@ public class PipelineNodeGraphVisitor extends StandardChunkVisitor {
 
   public List<FlowNodeWrapper> getPipelineNodes() {
     return new ArrayList<>(nodes);
+  }
+
+  public List<FlowNodeWrapper> getPipelineHistoryNodes() {
+    return new ArrayList<>(agenthistnodes);
   }
 
   private static Optional<FlowNodeWrapper> findNodeWrapperByIdIn(

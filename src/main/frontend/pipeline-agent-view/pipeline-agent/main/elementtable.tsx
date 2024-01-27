@@ -3,14 +3,17 @@ import { Table, Pagination } from 'element-react';
 
 import {Data,createData} from "../../dategrid";
 interface TableProps{
-    data: Array<Data>
+    data: Array<Data>;
+    fromJob:boolean
 }
 interface TableState {
 
     columns: Array<any>;
     data:Array<Data>;
+    
     currentPage: number;
-    pageSize:number
+    pageSize:number;
+    fullscreen:boolean;
    
   }
   
@@ -21,6 +24,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
     super(props);
     
     this.state = {
+      fullscreen :true,
       columns: [
         {
           label: "AgentName",
@@ -31,6 +35,33 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
         {
           label: "jobName",
           prop: "jobName",
+          width: 240,
+          sortable: true
+        },
+        {
+          label: "caseName",
+          prop: "casename",
+          render: function(data:any){
+            if (props.fromJob == false) {
+               return (
+              <span>
+              <a href={`../job/${data.jobName}/${data.buildNumber.split('')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
+          {data.casename}
+        </a>
+              </span>
+            )
+            }
+            else{
+              return (
+                <span>
+                <a href={`../../../job/${data.jobName}/${data.buildNumber.split('')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
+            {data.casename}
+          </a>
+                </span>
+              ) 
+            }
+           
+          },
           width: 240,
           sortable: true
         },
@@ -72,6 +103,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
 
     return (
       <div>
+         
         <Table
           style={{width: '100%'}}
           columns={columns}
@@ -79,6 +111,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
           border={true}
         
         />
+        
         <Pagination
           layout="total, prev, pager, next"
           total={total}
@@ -87,6 +120,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
           onCurrentChange={this.handlePageChange}
           onSizeChange={this.handleSizeChange}
         />
+        
       </div>
     )
   }

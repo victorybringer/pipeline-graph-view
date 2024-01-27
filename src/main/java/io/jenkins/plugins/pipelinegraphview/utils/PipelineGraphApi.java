@@ -49,96 +49,138 @@ public class PipelineGraphApi {
     return run.getParent().getNextBuildNumber();
   }
 
+
+  private static List<PipelineStageInternal> convertNodes(List<FlowNodeWrapper> l){
+
+            return l.stream()
+            .map(
+                flowNodeWrapper -> {
+                  String state = flowNodeWrapper.getStatus().getResult().name();
+                  if (! state.equals("AGENT") && flowNodeWrapper.getStatus().getState() != BlueRun.BlueRunState.FINISHED) {
+                    state = flowNodeWrapper.getStatus().getState().name().toLowerCase(Locale.ROOT);
+                  }
+    
+                  String name_id = flowNodeWrapper.getDisplayName();
+                  if (PipelineNodeUtil.isAgentStart(flowNodeWrapper.getNode())){
+                      
+                  
+                      name_id = PipelineNodeUtil.getAgentName(flowNodeWrapper.getNode());
+                    
+            
+                  }
+                  return new PipelineStageInternal(
+                      flowNodeWrapper
+                          .getId(), // TODO no need to parse it BO returns a string even though the
+                      // datatype is number on the frontend
+                      name_id,
+                      flowNodeWrapper.getParents().stream()
+                          .map(FlowNodeWrapper::getId)
+                          .collect(Collectors.toList()),
+                      state,
+                      50, // TODO how ???
+                     flowNodeWrapper.getType().name(),
+                     name_id, // TODO blue ocean uses timing information: "Passed in 0s"
+                      flowNodeWrapper.isSynthetic());
+                })
+            .collect(Collectors.toList());
+  }
+  
+  private static List<PipelineStageInternal> convertNodes2(List<FlowNodeWrapper> l, WorkflowRun run2){
+
+    return l.stream()
+    .map(
+        flowNodeWrapper -> {
+          String state = flowNodeWrapper.getStatus().getResult().name();
+          if (! state.equals("AGENT") && flowNodeWrapper.getStatus().getState() != BlueRun.BlueRunState.FINISHED) {
+            state = flowNodeWrapper.getStatus().getState().name().toLowerCase(Locale.ROOT);
+          }
+
+          String name_id = flowNodeWrapper.getDisplayName();
+          if (PipelineNodeUtil.isAgentStart(flowNodeWrapper.getNode())){
+              
+          
+              name_id = PipelineNodeUtil.getAgentName(flowNodeWrapper.getNode());
+            
+    
+          }
+          PipelineStageInternal res = null;
+          String parentid = flowNodeWrapper.getNode().getAllEnclosingIds().get(0);
+          try {
+            res = new PipelineStageInternal(
+              flowNodeWrapper
+                  .getId(), // TODO no need to parse it BO returns a string even though the
+              // datatype is number on the frontend
+              name_id,
+              flowNodeWrapper.getParents().stream()
+                  .map(FlowNodeWrapper::getId)
+                  .collect(Collectors.toList()),
+                  run2.getExecution().getNode(parentid).getDisplayName(),
+              50, // TODO how ???
+             flowNodeWrapper.getType().name(),
+             PipelineNodeUtil.getAgentStartTime(flowNodeWrapper.getNode()) +";" + parentid,
+              flowNodeWrapper.isSynthetic());
+          }
+          catch (Exception e)  {
+             res = null;
+          }
+          return  res;
+        }).collect(Collectors.toList());
+    
+}
+
   private List<PipelineStageInternal> getPipelineNodes() {
     
     PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run);
-    return builder.getPipelineNodes().stream()
-        .map(
-            flowNodeWrapper -> {
-              String state = flowNodeWrapper.getStatus().getResult().name();
-              if (! state.equals("AGENT") && flowNodeWrapper.getStatus().getState() != BlueRun.BlueRunState.FINISHED) {
-                state = flowNodeWrapper.getStatus().getState().name().toLowerCase(Locale.ROOT);
-              }
-
-              String name_id = flowNodeWrapper.getDisplayName();
-              if (PipelineNodeUtil.isAgentStart(flowNodeWrapper.getNode())){
-                  
-              
-                  name_id = PipelineNodeUtil.getAgentName(flowNodeWrapper.getNode());
-                
-        
-              }
-              return new PipelineStageInternal(
-                  flowNodeWrapper
-                      .getId(), // TODO no need to parse it BO returns a string even though the
-                  // datatype is number on the frontend
-                  name_id,
-                  flowNodeWrapper.getParents().stream()
-                      .map(FlowNodeWrapper::getId)
-                      .collect(Collectors.toList()),
-                  state,
-                  50, // TODO how ???
-                 flowNodeWrapper.getType().name(),
-                 name_id, // TODO blue ocean uses timing information: "Passed in 0s"
-                  flowNodeWrapper.isSynthetic());
-            })
-        .collect(Collectors.toList());
+    return convertNodes(builder.getPipelineNodes());
   }
+
+  private List<PipelineStageInternal> getPipelineHistoryNodes() {
+    
+    PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run);
+    return convertNodes2(builder.getPipelineHistoryNodes(),run);
+  }
+
+
   private static List<PipelineStageInternal> getPipelineNodesWithRun(WorkflowRun run0) {
     
     PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run0);
-    return builder.getPipelineNodes().stream()
-        .map(
-            flowNodeWrapper -> {
-              String state = flowNodeWrapper.getStatus().getResult().name();
-              if (! state.equals("AGENT") && flowNodeWrapper.getStatus().getState() != BlueRun.BlueRunState.FINISHED) {
-                state = flowNodeWrapper.getStatus().getState().name().toLowerCase(Locale.ROOT);
-              }
-
-              String name_id = flowNodeWrapper.getDisplayName();
-              if (PipelineNodeUtil.isAgentStart(flowNodeWrapper.getNode())){
-                  
-                 try {
-                  name_id = PipelineNodeUtil.getAgentName(flowNodeWrapper.getNode());
-                 } catch (Exception e) {
-                    name_id ="unknown";
-                 }
-                
-                
-        
-              }
-              return new PipelineStageInternal(
-                  flowNodeWrapper
-                      .getId(), // TODO no need to parse it BO returns a string even though the
-                  // datatype is number on the frontend
-                  name_id,
-                  flowNodeWrapper.getParents().stream()
-                      .map(FlowNodeWrapper::getId)
-                      .collect(Collectors.toList()),
-                  state,
-                  50, // TODO how ???
-                 flowNodeWrapper.getType().name(),
-                 name_id, // TODO blue ocean uses timing information: "Passed in 0s"
-                  flowNodeWrapper.isSynthetic());
-            })
-        .collect(Collectors.toList());
+    return convertNodes(builder.getPipelineNodes());
   }
-
   
-  public static List <PipelineGraphWithJob> getallJobs(){
+  private static List<PipelineStageInternal> getPipelineHistoryNodesWithRun(WorkflowRun run0) {
+    
+    PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run0);
+    return convertNodes2(builder.getPipelineHistoryNodes(),run0);
+  }
+  
+  public static List <PipelineGraphWithJob> getallJobshistory(){
     
     List <PipelineGraphWithJob> res = new ArrayList<>();
     
     Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
     
     for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
-     PipelineGraph pg = createTreeWithRun(e.getValue());
+     PipelineGraph pg = createHistoryTreeWithRun(e.getValue());
      res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString()));
     }
     
     return res;
 
  }
+ public static List <PipelineGraphWithJob> getallJobs(){
+    
+  List <PipelineGraphWithJob> res = new ArrayList<>();
+  
+  Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
+  
+  for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
+   PipelineGraph pg = createTreeWithRun(e.getValue());
+   res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString2()));
+  }
+  
+  return res;
+
+}
   public PipelineGraph createGraph() {
     List<PipelineStageInternal> stages = getPipelineNodes();
 
@@ -232,6 +274,85 @@ public class PipelineGraphApi {
    * Create a Tree from the GraphVisitor.
    * Original source: https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
    */
+  public static PipelineGraph createHistoryTreeWithRun(WorkflowRun run0) {
+    List<PipelineStageInternal> stages = getPipelineHistoryNodesWithRun(run0);
+    System.out.println(stages.size());
+    List<String> topLevelStageIds = new ArrayList<>();
+
+    // id => stage
+    Map<String, PipelineStageInternal> stageMap =
+        stages.stream()
+            .collect(
+                Collectors.toMap(
+                    PipelineStageInternal::getId, stage -> stage, (u, v) -> u, LinkedHashMap::new));
+
+    Map<String, List<String>> stageToChildrenMap = new HashMap<>();
+
+    FlowExecution execution = run0.getExecution();
+    if (execution == null) {
+      // If we don't have an execution - e.g. if the Pipeline has a syntax error - then return an
+      // empty graph.
+      return new PipelineGraph(new ArrayList<>(), false);
+    }
+    stages.forEach(
+        stage -> {
+          try {
+
+            
+            FlowNode stageNode = execution.getNode(stage.getId());
+            if (stageNode == null) {
+              return;
+            }
+          
+            String treeParentId = null;
+            // Compare the list of GraphVistor ancestors to the IDs of the enclosing node in the
+            // execution.
+            // If a node encloses another node, it means it's a tree parent, so the first ancestor
+            // ID we find
+            // which matches an enclosing node then it's the stages tree parent.
+            List<String> enclosingIds = stageNode.getAllEnclosingIds();
+           
+
+           
+            treeParentId = enclosingIds.get(0);
+            
+            if (treeParentId != null) {
+              List<String> childrenOfParent =
+                  stageToChildrenMap.getOrDefault(treeParentId, new ArrayList<>());
+              childrenOfParent.add(stage.getId());
+              stageToChildrenMap.put(treeParentId, childrenOfParent);
+            } else {
+              // If we can't find a matching parent in the execution and GraphVistor then this is a
+              // top level node.
+              stageToChildrenMap.put(stage.getId(), new ArrayList<>());
+              topLevelStageIds.add(stage.getId());
+            }
+          } catch (java.io.IOException ex) {
+            logger.error(
+                "Caught a "
+                    + ex.getClass().getSimpleName()
+                    + " when trying to find parent of stage '"
+                    + stage.getName()
+                    + "'");
+          }
+        });
+
+    List<PipelineStage> stageResults =
+        stageMap.values().stream()
+            .map(
+                pipelineStageInternal -> {
+                  List<PipelineStage> children =
+                      stageToChildrenMap.getOrDefault(pipelineStageInternal.getId(), emptyList())
+                          .stream()
+                          .map(mapper(stageMap, stageToChildrenMap))
+                          .collect(Collectors.toList());
+
+                  return pipelineStageInternal.toPipelineStage(children);
+                })
+            
+            .collect(Collectors.toList());
+    return new PipelineGraph(stageResults, execution.isComplete());
+  }
 
   public static PipelineGraph createTreeWithRun(WorkflowRun run0) {
     List<PipelineStageInternal> stages = getPipelineNodesWithRun(run0);

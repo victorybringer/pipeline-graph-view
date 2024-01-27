@@ -25,11 +25,11 @@
                         ${%Configure}
                     </a>
                 </div>
-                <script src="${rootURL}/plugin/pipeline-graph-view/js/build.js"/>
+                <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/build.js"/>
             </div>
 
             <div id="root"/>
-            <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/pipeline-console-view-bundle.js"/>
+            <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/bundles/pipeline-console-view-bundle.js"/>
         </l:main-panel>
     </l:layout>
 </j:jelly>

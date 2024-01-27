@@ -7,6 +7,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.FilePath;
 import hudson.model.Action;
 import hudson.model.Queue;
+import hudson.Util;
+import java.util.Date;
 import hudson.model.queue.CauseOfBlockage;
 import org.jenkinsci.plugins.pipeline.StageStatus;
 import org.jenkinsci.plugins.pipeline.SyntheticStage;
@@ -16,6 +18,7 @@ import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.LogAction;
 import org.jenkinsci.plugins.workflow.actions.QueueItemAction;
 import org.jenkinsci.plugins.workflow.actions.StageAction;
+import org.jenkinsci.plugins.workflow.actions.TimingAction;
 import org.jenkinsci.plugins.workflow.actions.TagsAction;
 import org.jenkinsci.plugins.workflow.actions.ThreadNameAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepAtomNode;
@@ -221,6 +224,18 @@ return res;
         return "";
       
   }
+
+  public static String getAgentStartTime(@NonNull FlowNode node){
+    if(node.getAction(TimingAction.class) != null){
+
+      String res = Util.XS_DATETIME_FORMATTER.format(new Date(node.getAction(TimingAction.class).getStartTime() )) ;
+        return res;
+    }
+    return "";
+  
+}
+
+
    
    public static FilePath getAgentWorkSpace(@NonNull  FlowNode node){
       if(node.getAction(WorkspaceAction.class) != null){
@@ -232,5 +247,7 @@ return res;
 
 
   }
+
+  
 
 }

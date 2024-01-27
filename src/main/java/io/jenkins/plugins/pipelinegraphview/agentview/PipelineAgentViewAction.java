@@ -23,6 +23,21 @@ public class PipelineAgentViewAction implements RootAction {
     return JSONObject.fromObject(graph);
   }
 
+  @WebMethod(name = "allhistory")
+  public HttpResponse gethistory() throws JsonProcessingException {
+    // TODO: This need to be updated to return a tree representation of the graph, not the graph.
+    // Here is how FlowGraphTree does it:
+    // https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
+    
+    JSONArray graphArray = new JSONArray();
+
+    for (PipelineGraphWithJob g : PipelineGraphApi.getallJobshistory()) {
+        JSONObject graph = JSONObject.fromObject(g);
+        graphArray.add(graph);
+    }
+    
+    return HttpResponses.okJSON(graphArray);
+  }
   @WebMethod(name = "alljobs")
   public HttpResponse getAllJobs() throws JsonProcessingException {
     // TODO: This need to be updated to return a tree representation of the graph, not the graph.
@@ -39,9 +54,10 @@ public class PipelineAgentViewAction implements RootAction {
     return HttpResponses.okJSON(graphArray);
   }
 
+
   @Override
   public String getIconFileName() {
-    return "/plugin/pipeline-graph-view-icore2/images/rocket-outline.svg";
+    return "/plugin/pipeline-graph-view-icore-test/images/rocket-outline.svg";
   }
 
   
