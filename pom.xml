@@ -8,14 +8,14 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>pipeline-graph-view-icore-test</artifactId>
+    <artifactId>pipeline-graph-view-for-agent-test</artifactId>
     <version>${changelist}</version>
     <packaging>hpi</packaging>
     <properties>
-        <changelist>pipeline-graph-view-icore-test</changelist>
+        <changelist>pipeline-graph-view-for-agent-test</changelist>
         <gitHubRepo>jenkinsci/pipeline-graph-view-plugin</gitHubRepo>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>2.346.1</jenkins.version>
+        <jenkins.version>2.361.1</jenkins.version>
         <node.version>16.17.0</node.version>
         <npm.version>8.19.2</npm.version>
        
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-durable-task-step</artifactId>
-            <version>1174.v73a_9a_17edce0</version>
+            <version>1190.vc93d7d457042</version>
         </dependency>
         <dependency>
             <groupId>org.jenkinsci.plugins</groupId>

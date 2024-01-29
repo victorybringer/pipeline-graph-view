@@ -1,6 +1,7 @@
 package io.jenkins.plugins.pipelinegraphview.agentview;
 
 import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.WebMethod;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,20 +25,18 @@ public class PipelineAgentViewAction implements RootAction {
   }
 
   @WebMethod(name = "allhistory")
-  public HttpResponse gethistory() throws JsonProcessingException {
-    // TODO: This need to be updated to return a tree representation of the graph, not the graph.
-    // Here is how FlowGraphTree does it:
-    // https://github.com/jenkinsci/workflow-support-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/visualization/table/FlowGraphTable.java#L126
-    
+  public HttpResponse gethistory(StaplerRequest request) throws JsonProcessingException {
     JSONArray graphArray = new JSONArray();
+    String st = request.getParameter("startdate");
+    String et = request.getParameter("enddate");
 
-    for (PipelineGraphWithJob g : PipelineGraphApi.getallJobshistory()) {
+    for (PipelineGraphWithJob g : PipelineGraphApi.getallJobshistory(st,et)) {
         JSONObject graph = JSONObject.fromObject(g);
         graphArray.add(graph);
     }
     
     return HttpResponses.okJSON(graphArray);
-  }
+}
   @WebMethod(name = "alljobs")
   public HttpResponse getAllJobs() throws JsonProcessingException {
     // TODO: This need to be updated to return a tree representation of the graph, not the graph.
@@ -57,7 +56,7 @@ public class PipelineAgentViewAction implements RootAction {
 
   @Override
   public String getIconFileName() {
-    return "/plugin/pipeline-graph-view-icore-test/images/rocket-outline.svg";
+    return "/plugin/pipeline-graph-view-for-agent-test/images/rocket-outline.svg";
   }
 
   

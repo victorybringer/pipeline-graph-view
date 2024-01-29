@@ -45,7 +45,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
             if (props.fromJob == false) {
                return (
               <span>
-              <a href={`../job/${data.jobName}/${data.buildNumber.split('')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
+              <a href={`../job/${data.jobName}/${data.buildNumber.split('#')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
           {data.casename}
         </a>
               </span>
@@ -54,7 +54,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
             else{
               return (
                 <span>
-                <a href={`../../../job/${data.jobName}/${data.buildNumber.split('')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
+                <a href={`../../../job/${data.jobName}/${data.buildNumber.split('#')[1]}/pipeline-console?selected-node=${data.nodeid}`} target="_blank" >
             {data.casename}
           </a>
                 </span>
@@ -102,7 +102,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
     
 
     return (
-      <div>
+      <div style= {{marginTop:"20px"}}>
          
         <Table
           style={{width: '100%'}}
@@ -113,12 +113,9 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
         />
         
         <Pagination
-          layout="total, prev, pager, next"
+          layout="total"
           total={total}
-          pageSize = {pageSize}
-          currentPage={currentPage}
-          onCurrentChange={this.handlePageChange}
-          onSizeChange={this.handleSizeChange}
+         
         />
         
       </div>

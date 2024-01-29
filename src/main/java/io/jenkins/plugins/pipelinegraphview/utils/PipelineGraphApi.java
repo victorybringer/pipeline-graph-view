@@ -136,7 +136,7 @@ public class PipelineGraphApi {
 
   private List<PipelineStageInternal> getPipelineHistoryNodes() {
     
-    PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run);
+    PipelineNodeGraphVisitor2 builder = new PipelineNodeGraphVisitor2(run);
     return convertNodes2(builder.getPipelineHistoryNodes(),run);
   }
 
@@ -149,18 +149,29 @@ public class PipelineGraphApi {
   
   private static List<PipelineStageInternal> getPipelineHistoryNodesWithRun(WorkflowRun run0) {
     
-    PipelineNodeGraphVisitor builder = new PipelineNodeGraphVisitor(run0);
+    PipelineNodeGraphVisitor2 builder = new PipelineNodeGraphVisitor2(run0);
     return convertNodes2(builder.getPipelineHistoryNodes(),run0);
   }
   
-  public static List <PipelineGraphWithJob> getallJobshistory(){
+  public static List <PipelineGraphWithJob> getallJobshistory(String starttime,String endtime){
     
     List <PipelineGraphWithJob> res = new ArrayList<>();
     
     Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
-    
+     
     for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
-     PipelineGraph pg = createHistoryTreeWithRun(e.getValue());
+    
+     if(starttime != null && endtime != null){
+      long start = Long.parseLong(starttime);
+    long end = Long.parseLong(endtime);
+          logger.info(e.getValue().getTimeInMillis() + "" );
+          logger.info(e.getValue().getFullDisplayName() );
+          if (e.getValue().getTimeInMillis() > end || e.getValue().getTimeInMillis() < start ){
+            continue;
+          }
+         
+     }
+      PipelineGraph pg = createHistoryTreeWithRun(e.getValue());
      res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString()));
     }
     
@@ -276,17 +287,6 @@ public class PipelineGraphApi {
    */
   public static PipelineGraph createHistoryTreeWithRun(WorkflowRun run0) {
     List<PipelineStageInternal> stages = getPipelineHistoryNodesWithRun(run0);
-    System.out.println(stages.size());
-    List<String> topLevelStageIds = new ArrayList<>();
-
-    // id => stage
-    Map<String, PipelineStageInternal> stageMap =
-        stages.stream()
-            .collect(
-                Collectors.toMap(
-                    PipelineStageInternal::getId, stage -> stage, (u, v) -> u, LinkedHashMap::new));
-
-    Map<String, List<String>> stageToChildrenMap = new HashMap<>();
 
     FlowExecution execution = run0.getExecution();
     if (execution == null) {
@@ -294,60 +294,14 @@ public class PipelineGraphApi {
       // empty graph.
       return new PipelineGraph(new ArrayList<>(), false);
     }
-    stages.forEach(
-        stage -> {
-          try {
-
-            
-            FlowNode stageNode = execution.getNode(stage.getId());
-            if (stageNode == null) {
-              return;
-            }
-          
-            String treeParentId = null;
-            // Compare the list of GraphVistor ancestors to the IDs of the enclosing node in the
-            // execution.
-            // If a node encloses another node, it means it's a tree parent, so the first ancestor
-            // ID we find
-            // which matches an enclosing node then it's the stages tree parent.
-            List<String> enclosingIds = stageNode.getAllEnclosingIds();
-           
-
-           
-            treeParentId = enclosingIds.get(0);
-            
-            if (treeParentId != null) {
-              List<String> childrenOfParent =
-                  stageToChildrenMap.getOrDefault(treeParentId, new ArrayList<>());
-              childrenOfParent.add(stage.getId());
-              stageToChildrenMap.put(treeParentId, childrenOfParent);
-            } else {
-              // If we can't find a matching parent in the execution and GraphVistor then this is a
-              // top level node.
-              stageToChildrenMap.put(stage.getId(), new ArrayList<>());
-              topLevelStageIds.add(stage.getId());
-            }
-          } catch (java.io.IOException ex) {
-            logger.error(
-                "Caught a "
-                    + ex.getClass().getSimpleName()
-                    + " when trying to find parent of stage '"
-                    + stage.getName()
-                    + "'");
-          }
-        });
+   
 
     List<PipelineStage> stageResults =
-        stageMap.values().stream()
+        stages.stream()
             .map(
                 pipelineStageInternal -> {
-                  List<PipelineStage> children =
-                      stageToChildrenMap.getOrDefault(pipelineStageInternal.getId(), emptyList())
-                          .stream()
-                          .map(mapper(stageMap, stageToChildrenMap))
-                          .collect(Collectors.toList());
-
-                  return pipelineStageInternal.toPipelineStage(children);
+                  
+                  return pipelineStageInternal.toPipelineStage(new ArrayList<>());
                 })
             
             .collect(Collectors.toList());

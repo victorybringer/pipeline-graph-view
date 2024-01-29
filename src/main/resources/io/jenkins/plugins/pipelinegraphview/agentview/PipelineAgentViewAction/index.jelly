@@ -9,11 +9,11 @@
                    
                 </div>
                 
-                <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/build.js"/>
+                <script src="${rootURL}/plugin/pipeline-graph-view-for-agent-test/js/build.js"/>
             </div>
 
             <div id="root"/>
-            <script src="${rootURL}/plugin/pipeline-graph-view-icore-test/js/bundles/pipeline-agent-view-bundle.js"/>
+            <script src="${rootURL}/plugin/pipeline-graph-view-for-agent-test/js/bundles/pipeline-agent-view-bundle.js"/>
         </l:main-panel>
     </l:layout>
 </j:jelly>

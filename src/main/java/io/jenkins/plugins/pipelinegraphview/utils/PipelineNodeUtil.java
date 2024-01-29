@@ -228,7 +228,7 @@ return res;
   public static String getAgentStartTime(@NonNull FlowNode node){
     if(node.getAction(TimingAction.class) != null){
 
-      String res = Util.XS_DATETIME_FORMATTER.format(new Date(node.getAction(TimingAction.class).getStartTime() )) ;
+      String res = node.getAction(TimingAction.class).getStartTime() + "" ;
         return res;
     }
     return "";
