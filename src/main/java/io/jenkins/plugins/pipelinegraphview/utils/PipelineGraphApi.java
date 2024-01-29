@@ -156,21 +156,13 @@ public class PipelineGraphApi {
   public static List <PipelineGraphWithJob> getallJobshistory(String starttime,String endtime){
     
     List <PipelineGraphWithJob> res = new ArrayList<>();
-    
-    Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRun();
+     long start = Long.parseLong(starttime);
+    long end = Long.parseLong(endtime);
+    Map<String,WorkflowRun> allrun = WorkFlowRunApi.getAllWorkFlowRunhistory(start,end);
      
     for (Map.Entry<String,WorkflowRun> e: allrun.entrySet()){
     
-     if(starttime != null && endtime != null){
-      long start = Long.parseLong(starttime);
-    long end = Long.parseLong(endtime);
-          logger.info(e.getValue().getTimeInMillis() + "" );
-          logger.info(e.getValue().getFullDisplayName() );
-          if (e.getValue().getTimeInMillis() > end || e.getValue().getTimeInMillis() < start ){
-            continue;
-          }
-         
-     }
+    
       PipelineGraph pg = createHistoryTreeWithRun(e.getValue());
      res.add(new PipelineGraphWithJob(pg.getStages(),pg.isComplete(),e.getKey().split(";")[0],e.getKey().split(";")[1],e.getValue().getTimestampString()));
     }

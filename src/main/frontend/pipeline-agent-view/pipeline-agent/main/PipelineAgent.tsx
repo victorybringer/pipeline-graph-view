@@ -137,7 +137,7 @@ export class PipelineAgent extends React.Component<
       <React.Fragment>
         <div className="App">
         <div className="block">
-        <div style = {{display:"flex",justifyContent:"center"}}><h1 >for-agent Pipeline Agent History OverView</h1></div>
+        <div style = {{display:"flex",justifyContent:"center"}}><h1 > Pipeline Agent History OverView</h1></div>
         
         <DateRangePicker
           style= {{marginTop:"20px"}}
