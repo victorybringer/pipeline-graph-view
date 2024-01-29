@@ -107,7 +107,7 @@ class PaginatedTable extends React.Component<TableProps,TableState> {
         <Table
           style={{width: '100%'}}
           columns={columns}
-          data={displayData}
+          data={data}
           border={true}
         
         />
